@@ -1,0 +1,20 @@
+Based on the provided specifications, each routine works as expected, and
+passes the given test cases.
+
+One deficiency in the implementation is that error checking is not as robust
+as it could be. Edge cases were not well-defined in the specifications, and
+we were told that only valid input would be used with our routines, so robust
+error handling was not expected. I did, however, make en effort to return
+errors in the cases of bad input.
+
+Another deficiency is that certain error cases were checked separately in
+each routine, which led to duplicate code, as well as duplicate error checks.
+This could have been prevented by creating additional routines to handle
+error-checking.
+
+In terms of efficiency and storage, some routines use recursive calls with
+objects created using 'cons' to reduce the problem size until an answer can
+be found. This does use extra space whenever new objects are created. However,
+the amount of extra space was minimized by using tail recursion to reduce the
+space on the stack, as seen in routines such as "length-ld". This effectively
+causes each recursive call to use roughly the same amount of stack space.

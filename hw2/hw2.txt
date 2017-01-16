@@ -1,0 +1,79 @@
+I. convert_grammar function:
+    i. Purpose
+    The purpose of the "convert_grammar" function was to allow for the grammar
+    that was written in the first homework assignment to be converted to
+    grammar that could be use in the second assignment. The new grammar is
+    still represented as a tuple, where the first element is the starting
+    symbol. However, the second element is now a production function.
+
+    ii. get_alt_list Helper Function
+    I used a helper function that takes a non-terminal symbol, and returns a
+    list that contains lists of symbols that correspond to the specified
+    symbol in the given list of rules. By using function currying, a
+    production function was created using the list of rules from the original
+    grammar.
+ 
+    iii. Weaknesses
+    Given properly-formatted grammar in the style of homework 1, the function
+    consistently produces the corresponding grammar in the style of homework 2.
+    I did not find any major weaknesses with the given approach.
+
+II. parse_prefix function:
+    i. Purpose
+    The purpose of the "parse_prefix" function was to return a matcher for the
+    given grammar. Given an acceptor and a fragment, the matcher would return
+    the first match of a prefix of the fragment. Initially, I had trouble
+    figuring out what the function was supposed to do, and what the parameters
+    meant. However, by manually tracing through the steps for simple examples,
+    I came up with the following implementation.
+        In order to create the function, I created two main mutually recursive
+    helper functions, "find_match" and "symbol_list_matcher". By passing the
+    starting symbol, the alternative list corresponding to the starting
+    symbol, and an empty list representing the initial derivation list into
+    the "find_match" function, the corresponding matcher function is returned.
+
+    ii. find_match Helper Function
+    The "find_match" helper function was created to see if a list of symbols
+    (contained in the starting symbol's alternative list) could be used to
+    match a prefix of the given fragment. An attempt is made to match each
+    list to a prefix of the fragment by appending the current starting symbol
+    and symbol list to the derviation list, and providing the symbol list and
+    fragment to another helper function, "symbol_list_matcher".
+        If the helper function returns None, it means that the current list
+    could not be matched with a prefix of the fragment, and that the next list
+    in the alternative list should be tried. Otherwise, the function returns
+    the value that the helper function returns, since a match was found.
+
+    iii. symbol_list_matcher Helper Function
+    The "symbol_list_matcher" helper function was created to see if a given
+    list of symbols could be used to match with a prefix of the provided
+    fragment.
+        If the list is empty, it means that there are no more symbols to match,
+    and the provided acceptor should be used to check if the derviation is
+    valid. If the list is not empty, but the fragment is empty, it means that
+    there are some symbols that were not properly matched. Otherwise, if the
+    list is not empty, and the fragment is not empty, the type of the head
+    symbol should be checked. 
+        If the head symbol is terminal, and it matches the head of the
+    fragment, the rest of the fragment can be checked against the remaining
+    symbols. But if the head symbol is terminal, and it does not match the
+    head of the fragment, the function returns None since there is no way to
+    match the list of symbols with a prefix of the fragment.
+        If the head symbol is non-terminal, the remaining symbols and acceptor
+    are passed into the "symbol_list_matcher" function to create a new
+    "acceptor". Afterwards, the "find_match" helper function is called again
+    to see if a list from the alternate list produced with the head symbol
+    can be used to match with a prefix of the fragment. However, the newly
+    created acceptor is passed because of the fact that a match only means
+    that the head symbol was successfully matched with a prefix of the
+    fragment, and that the rest of the symbols need to be checked as well.
+
+    iV. Weaknesses
+    The main problem with this approach for parsing a prefix from a given
+    fragment is that it relies on a leftmost derivation, which means that
+    the leftmost list of symbols in an alternative list is always checked
+    first. This is problematic, because it may cause an infinite recursive
+    loop by continuously expanding non-terminals. For example, if a rule
+    "Expr -> [[N Term; N Binop; N Expr]; [N Term]]" was replaced with
+    "Expr -> [[N Expr; N Binop; N Expr]; [N Term]]", the function would
+    get stuck in an infinite loop because it would keep evaluating "N Expr".
